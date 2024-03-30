@@ -14,6 +14,7 @@ static differentiator_error load_data(Differentiator* differentiator, const char
 static char* make_tree(Differentiator* differntiator);
 static void differentiator_dtr(Differentiator* differentiator);
 static void tree_dtor(Node* ptr_node);
+static Node* diff(const Node* node);
 static Node* create_op_node(operation operation, Node* left, Node* right, Node* parent);
 static Node* create_num_node(double value, Node* left, Node* right, Node* parent);
 static Node* create_var_node(char* variable, Node* left, Node* right, Node* parent);
@@ -71,7 +72,7 @@ char* make_tree(Differentiator* differentiator)
     }
     else if (*differentiator->buffer)
     {
-
+        ///////////////////////READDDDDDDDDDDDDDDDDDDDDDDD
     }
     return differentiator->buffer;
 }
@@ -102,6 +103,82 @@ void tree_dtor(Node* ptr_node)
     free(ptr_node);
 }
 
+Node* diff(Node* node)
+{
+    ASSERT(node != nullptr);
+
+    Node* new_node = (Node*)calloc(1, sizeof(Node));
+
+    switch(node->type)
+    {
+        case type_num:
+        {
+            return _NUM(0, node->parent);
+        }
+
+        case type_var:
+        {
+            return _NUM(1, node->parent);
+        }
+
+        case type_operation:
+        {
+            switch(node->operation)
+            {
+                case add:
+                {
+                    new_node = _ADD(dL, dR, node->parent);
+                    return new_node;
+                }
+
+                case sub:
+                {
+                    new_node = _DIV(dL, dR, node->parent);
+                    return new_node;
+                }
+
+                case mul:
+                {
+                    new_node = _MUL(dL + cR, cR + dL, node->parent);
+                    return new_node;
+                }
+
+                case div: 
+                {
+                    new_node = _DIV(dL * cR - cL * dR, cR * cR, node->parent);
+                    return new_node;
+                }
+
+                case sn:
+                {
+                    new_node = _MUL(dL, _COS(cL, diff_node), node->parent);
+                    return new_node;
+                }
+
+                case cs:
+                {
+                    new_node = _MUL(_NUM(-1, diff_node), 
+                                            _MUL(dL, _SIN(cL, diff_node), node->parent), 
+                                                                          node->parent);
+                    return new_node;
+                }
+
+                case ln:
+                {
+                    new_node = _MUL(dL, _DIV(_NUM(1,0), сL, diff_node), node->parent);
+                    return new_node;
+                }
+
+                default:
+                {
+                    fprintf(stderr, "bye bye \n");
+                    ASSERT(0 && ":(");
+                }
+            } 
+        }
+    }
+}
+
 Node* create_op_node(operation operation, Node* left, Node* right, Node* parent)
 {
     ASSERT(parent != nullptr);
@@ -116,6 +193,8 @@ Node* create_op_node(operation operation, Node* left, Node* right, Node* parent)
     op_node->parent     = parent;    
     op_node->left       = left;
     op_node->right      = right;
+
+    return op_node;
 }
 
 Node* create_num_node(double value, Node* left, Node* right, Node* parent)

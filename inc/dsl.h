@@ -25,8 +25,8 @@
 #define _DIV(left, right, parent)   create_op_node(div, left, right, parent)
 
 // Сложные функции
-#define _SIN(left)          create_op_node(sin, left, nullptr, parent)
-#define _COS(left)          create_op_node(cos, left, nullptr, parent)     
-#define _LN (left)          create_op_node(ln,  left, nullptr, parent)
+#define _SIN(left, parent)          create_op_node(sin, left, nullptr, parent)
+#define _COS(left, parent)          create_op_node(cos, left, nullptr, parent)     
+#define _LN (left, parent)          create_op_node(ln,  left, nullptr, parent)
 
 #endif // DSL_H

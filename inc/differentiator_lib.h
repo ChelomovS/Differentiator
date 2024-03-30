@@ -44,6 +44,7 @@ differentiator_error load_data(Differentiator* differentiator, const char* file_
 char* make_tree(Differentiator* differntiator);
 void differentiator_dtr(Differentiator* differentiator);
 void tree_dtor(Node* ptr_node);
+Node* diff(const Node* node);
 Node* create_op_node(operation operation, Node* left, Node* right, Node* parent);
 Node* create_num_node(double value, Node* left, Node* right, Node* parent);
 Node* create_var_node(char* variable, Node* left, Node* right, Node* parent);

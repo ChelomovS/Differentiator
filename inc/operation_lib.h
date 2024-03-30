@@ -10,8 +10,8 @@ enum operation
     sub           = 2,
     mul           = 3,  
     div           = 4,
-    sin           = 5,
-    cos           = 6, 
+    sn            = 5,
+    cs            = 6, 
     ln            = 7
 };
 
