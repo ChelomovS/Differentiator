@@ -5,12 +5,15 @@
 #include "operation_lib.h"
 
 const size_t MAX_SIZE_OF_BUFFER = 1000;
+const size_t MAX_SIZE_OF_VAR    = 5;
 
 struct Node
 { 
     type type;
     operation operation;
     double value;
+    char var[MAX_SIZE_OF_VAR]; 
+    
     Node* left;
     Node* right;
     Node* parent;

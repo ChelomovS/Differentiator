@@ -2,6 +2,7 @@
 #define DSL_H
 
 #include "differentiator_lib.h"
+
 // Дифференцирование левого узла
 #define dL diff(node->left)
 // Дифференцирование правого узла
@@ -22,6 +23,7 @@
 #define _SUB(left, right)   create_op_node(sub, left, right)
 #define _MUL(left, right)   create_op_node(mul, left, right)
 #define _DIV(left, right)   create_op_node(div, left, right)
+
 // Сложные функции
 #define _SIN(left)          create_op_node(sin, left, nullptr)
 #define _COS(left)          create_op_node(cos, left, nullptr)     

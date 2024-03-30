@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "../inc/differentiator_lib.h"
 #include "../inc/operation_lib.h"
@@ -103,19 +104,51 @@ void tree_dtor(Node* ptr_node)
     free(ptr_node);
 }
 
-Node* create_op_node(operation operation, Node* left, Node* right)
+Node* create_op_node(operation operation, Node* left, Node* right, Node* parent)
 {
+    ASSERT(parent != nullptr);
+    ASSERT(left != nullptr);
 
+    Node* op_node = (Node*)calloc(1, sizeof(Node));
+    ASSERT(op_node != nullptr);
+
+    op_node->type       = type_operation;
+    op_node->value      = 0;
+    op_node->operation  = operation;
+    op_node->parent     = parent;    
+    op_node->left       = left;
+    op_node->right      = right;
 }
 
-Node* create_num_node(int value, Node* left, Node* right)
+Node* create_num_node(double value, Node* left, Node* right, Node* parent)
 {
+    ASSERT(parent != nullptr);
 
+    Node* num_node = (Node*)calloc(1, sizeof(Node));
+    ASSERT(num_node != nullptr);
+
+    num_node->type      = type_num;
+    num_node->value     = value;
+    num_node->operation = not_operation;
+    num_node->left      = left;
+    num_node->right     = right;
+    num_node->parent    = parent;
 }
 
-Node* create_var_node(const char* variable, Node* left, Node* right)
+Node* create_var_node(char* variable, Node* left, Node* right, Node* parent)
 {
+    ASSERT(parent != nullptr);
 
+    Node* var_node = (Node*)calloc(1, sizeof(Node));
+    ASSERT(var_node != nullptr);
+
+    var_node->type      = type_var;
+    var_node->left      = left;
+    var_node->right     = right;
+    var_node->value     = 0;
+    strcpy(var_node->var, variable);
+    var_node->operation = not_operation;
+    var_node->parent    = parent;
 }
 
 void error_processing(differentiator_error error)
