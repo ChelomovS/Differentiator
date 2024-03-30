@@ -4,14 +4,14 @@
 #include "differentiator_lib.h"
 
 // Дифференцирование левого узла
-#define dL diff(node->left)
+#define dL diff(ptr_node->left)
 // Дифференцирование правого узла
-#define dR diff(node->right)
+#define dR diff(ptr_node->right)
 
 // Копирование левого узла
-#define cL copy_node(node->right)
+#define cL copy_node(ptr_node->right)
 // Копирование левого узла
-#define cR copy_node(node->left)
+#define cR copy_node(ptr_node->left)
 
 // Создание узла с const
 #define _NUM(value, parent)         create_num_node(value,    nullptr, nullptr, parent)
@@ -25,8 +25,8 @@
 #define _DIV(left, right, parent)   create_op_node(div, left, right, parent)
 
 // Сложные функции
-#define _SIN(left, parent)          create_op_node(sin, left, nullptr, parent)
-#define _COS(left, parent)          create_op_node(cos, left, nullptr, parent)     
+#define _SIN(left, parent)          create_op_node(sn, left, nullptr, parent)
+#define _COS(left, parent)          create_op_node(cs, left, nullptr, parent)     
 #define _LN (left, parent)          create_op_node(ln,  left, nullptr, parent)
 
 #endif // DSL_H

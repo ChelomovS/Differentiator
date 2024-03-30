@@ -11,15 +11,15 @@
 //------------------------------------------------------------------------------------
 static differentiator_error differentiator_ctr(Differentiator* differntiator);
 static differentiator_error load_data(Differentiator* differentiator, const char* file_name);
-static char* make_tree(Differentiator* differntiator);
-static void differentiator_dtr(Differentiator* differentiator);
-static void tree_dtor(Node* ptr_node);
-static Node* diff(const Node* node);
-static Node* create_op_node(operation operation, Node* left, Node* right, Node* parent);
-static Node* create_num_node(double value, Node* left, Node* right, Node* parent);
-static Node* create_var_node(char* variable, Node* left, Node* right, Node* parent);
-static void error_processing(differentiator_error error);
-static void useage();
+static char* make_tree         (Differentiator* differntiator);
+static void  differentiator_dtr(Differentiator* differentiator);
+static void  tree_dtor         (Node* ptr_node);
+static Node* diff              (const Node* node);
+static Node* create_op_node    (operation operation, Node* left, Node* right, Node* parent);
+static Node* create_num_node   (double value, Node* left, Node* right, Node* parent);
+static Node* create_var_node   (char* variable, Node* left, Node* right, Node* parent);
+static void  error_processing  (differentiator_error error);
+static void  useage();
 //------------------------------------------------------------------------------------
 
 differentiator_error differentiator_ctr(Differentiator* differentiator)
@@ -103,69 +103,72 @@ void tree_dtor(Node* ptr_node)
     free(ptr_node);
 }
 
-Node* diff(Node* node)
+Node* diff(Node* ptr_node)
 {
-    ASSERT(node != nullptr);
+    ASSERT(ptr_node != nullptr);
 
     Node* new_node = (Node*)calloc(1, sizeof(Node));
 
-    switch(node->type)
+    switch(ptr_node->type)
     {
         case type_num:
         {
-            return _NUM(0, node->parent);
+            return _NUM(0, ptr_node->parent);
         }
 
         case type_var:
         {
-            return _NUM(1, node->parent);
+            return _NUM(1, ptr_node->parent);
         }
 
         case type_operation:
         {
-            switch(node->operation)
+            switch(ptr_node->operation)
             {
                 case add:
                 {
-                    new_node = _ADD(dL, dR, node->parent);
+                    new_node = _ADD(dL, dR, ptr_node->parent);
                     return new_node;
                 }
 
                 case sub:
                 {
-                    new_node = _DIV(dL, dR, node->parent);
+                    new_node = _DIV(dL, dR, ptr_node->parent);
                     return new_node;
                 }
 
                 case mul:
                 {
-                    new_node = _MUL(dL + cR, cR + dL, node->parent);
+                    new_node = _MUL(_ADD(dR, cL, new_node), _ADD(cR, dL, new_node), 
+                                                                 ptr_node->parent);
                     return new_node;
                 }
 
                 case div: 
                 {
-                    new_node = _DIV(dL * cR - cL * dR, cR * cR, node->parent);
+                    new_node = _DIV(_SUB(_MUL(dL, cR, new_node->left), 
+                                        _MUL(cL, dR, new_node->right), new_node), 
+                                        _MUL(cR, cR, new_node), ptr_node->parent);
                     return new_node;
                 }
 
                 case sn:
                 {
-                    new_node = _MUL(dL, _COS(cL, diff_node), node->parent);
+                    new_node = _MUL(dL, _COS(cL, new_node), ptr_node->parent);
                     return new_node;
                 }
 
                 case cs:
                 {
-                    new_node = _MUL(_NUM(-1, diff_node), 
-                                            _MUL(dL, _SIN(cL, diff_node), node->parent), 
-                                                                          node->parent);
+                    new_node = _MUL(_NUM(-1, new_node), 
+                                        _MUL(dL, _SIN(cL, new_node), ptr_node->parent), 
+                                                                     ptr_node->parent);
                     return new_node;
                 }
 
                 case ln:
                 {
-                    new_node = _MUL(dL, _DIV(_NUM(1,0), сL, diff_node), node->parent);
+                    new_node = _MUL(dL, _DIV(_NUM(1,0), cL, new_node), ptr_node->parent);
                     return new_node;
                 }
 
@@ -177,6 +180,35 @@ Node* diff(Node* node)
             } 
         }
     }
+}
+
+Node* copy_node(Node* ptr_node)
+{
+    ASSERT(ptr_node != nullptr);
+
+    Node* copied_node = (Node*)calloc(1, sizeof(Node));
+    ASSERT(copied_node != nullptr);
+
+    // копирование данных из старого узла
+    copied_node->type      = ptr_node->type;
+    copied_node->operation = ptr_node->operation;
+    copied_node->value     = ptr_node->value;
+    strcpy(copied_node->var, ptr_node->var);
+    copied_node->parent    = ptr_node->parent;
+
+    // рекурсивный вызов в левое поддерево
+    if (ptr_node->left)
+    {
+        copied_node->left = copy_node(ptr_node->left);
+    }
+    
+    // рекурсивный вызов в правое поддерево
+    if (ptr_node->right)
+    {
+        copied_node->left = copy_node(ptr_node->right);
+    }
+
+    return copied_node;
 }
 
 Node* create_op_node(operation operation, Node* left, Node* right, Node* parent)
