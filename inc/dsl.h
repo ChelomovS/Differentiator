@@ -14,18 +14,19 @@
 #define cR copy_node(node->left)
 
 // Создание узла с const
-#define _NUM(value)         create_num_node(value,    nullptr, nullptr)
+#define _NUM(value, parent)         create_num_node(value,    nullptr, nullptr, parent)
 // Создание узла с переменной
-#define _VAR(variable)      create_var_node(variable, nullptr, nullptr)
+#define _VAR(variable, parent)      create_var_node(variable, nullptr, nullptr, parent)
 
 // Создание узлов операций
-#define _ADD(left, right)   create_op_node(add, left, right)
-#define _SUB(left, right)   create_op_node(sub, left, right)
-#define _MUL(left, right)   create_op_node(mul, left, right)
-#define _DIV(left, right)   create_op_node(div, left, right)
+#define _ADD(left, right, parent)   create_op_node(add, left, right, parent)
+#define _SUB(left, right, parent)   create_op_node(sub, left, right, parent)
+#define _MUL(left, right, parent)   create_op_node(mul, left, right, parent)
+#define _DIV(left, right, parent)   create_op_node(div, left, right, parent)
 
 // Сложные функции
-#define _SIN(left)          create_op_node(sin, left, nullptr)
-#define _COS(left)          create_op_node(cos, left, nullptr)     
+#define _SIN(left)          create_op_node(sin, left, nullptr, parent)
+#define _COS(left)          create_op_node(cos, left, nullptr, parent)     
+#define _LN (left)          create_op_node(ln,  left, nullptr, parent)
 
 #endif // DSL_H

@@ -8,6 +8,19 @@
 #include "../shared/file_lib.h"
 #include "../inc/dsl.h"
 
+//------------------------------------------------------------------------------------
+static differentiator_error differentiator_ctr(Differentiator* differntiator);
+static differentiator_error load_data(Differentiator* differentiator, const char* file_name);
+static char* make_tree(Differentiator* differntiator);
+static void differentiator_dtr(Differentiator* differentiator);
+static void tree_dtor(Node* ptr_node);
+static Node* create_op_node(operation operation, Node* left, Node* right, Node* parent);
+static Node* create_num_node(double value, Node* left, Node* right, Node* parent);
+static Node* create_var_node(char* variable, Node* left, Node* right, Node* parent);
+static void error_processing(differentiator_error error);
+static void useage();
+//------------------------------------------------------------------------------------
+
 differentiator_error differentiator_ctr(Differentiator* differentiator)
 {
     ASSERT(differentiator != nullptr);
@@ -61,21 +74,6 @@ char* make_tree(Differentiator* differentiator)
 
     }
     return differentiator->buffer;
-}
-
-differentiator_error make_node(Node* node, type type, operation operation, double value, Node* left, Node* right)
-{
-    node = (Node*)calloc(1, sizeof(Node));
-    if (node == nullptr)
-        return differentiator_bad_alloc;
-
-    node->type = type;
-    node->operation = operation;
-    node->value = value;
-    node->left = left;
-    node->right = right;
-
-    return differentiator_ok;
 }
 
 void differentiator_dtr(Differentiator* differentiator)
