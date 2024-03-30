@@ -8,20 +8,6 @@
 #include "../shared/file_lib.h"
 #include "../inc/dsl.h"
 
-//------------------------------------------------------------------------------------
-static differentiator_error differentiator_ctr(Differentiator* differntiator);
-static differentiator_error load_data(Differentiator* differentiator, const char* file_name);
-static char* make_tree         (Differentiator* differntiator);
-static void  differentiator_dtr(Differentiator* differentiator);
-static void  tree_dtor         (Node* ptr_node);
-static Node* diff              (const Node* node);
-static Node* create_op_node    (operation operation, Node* left, Node* right, Node* parent);
-static Node* create_num_node   (double value, Node* left, Node* right, Node* parent);
-static Node* create_var_node   (char* variable, Node* left, Node* right, Node* parent);
-static void  error_processing  (differentiator_error error);
-static void  useage();
-//------------------------------------------------------------------------------------
-
 differentiator_error differentiator_ctr(Differentiator* differentiator)
 {
     ASSERT(differentiator != nullptr);
@@ -125,26 +111,26 @@ Node* diff(Node* ptr_node)
         {
             switch(ptr_node->operation)
             {
-                case add:
+                case ADD:
                 {
                     new_node = _ADD(dL, dR, ptr_node->parent);
                     return new_node;
                 }
 
-                case sub:
+                case SUB:
                 {
                     new_node = _DIV(dL, dR, ptr_node->parent);
                     return new_node;
                 }
 
-                case mul:
+                case MUL:
                 {
                     new_node = _MUL(_ADD(dR, cL, new_node), _ADD(cR, dL, new_node), 
                                                                  ptr_node->parent);
                     return new_node;
                 }
 
-                case div: 
+                case DIV: 
                 {
                     new_node = _DIV(_SUB(_MUL(dL, cR, new_node->left), 
                                         _MUL(cL, dR, new_node->right), new_node), 
@@ -152,13 +138,13 @@ Node* diff(Node* ptr_node)
                     return new_node;
                 }
 
-                case sn:
+                case SIN:
                 {
                     new_node = _MUL(dL, _COS(cL, new_node), ptr_node->parent);
                     return new_node;
                 }
 
-                case cs:
+                case COS:
                 {
                     new_node = _MUL(_NUM(-1, new_node), 
                                         _MUL(dL, _SIN(cL, new_node), ptr_node->parent), 
@@ -166,10 +152,16 @@ Node* diff(Node* ptr_node)
                     return new_node;
                 }
 
-                case ln:
+                case LN:
                 {
                     new_node = _MUL(dL, _DIV(_NUM(1,0), cL, new_node), ptr_node->parent);
                     return new_node;
+                }
+                
+                case NOT_OPERATION:
+                {
+                    fprintf(stderr, "shit happened\n");
+                    ASSERT(0 && ":(");
                 }
 
                 default:
@@ -238,10 +230,12 @@ Node* create_num_node(double value, Node* left, Node* right, Node* parent)
 
     num_node->type      = type_num;
     num_node->value     = value;
-    num_node->operation = not_operation;
+    num_node->operation = NOT_OPERATION;
     num_node->left      = left;
     num_node->right     = right;
     num_node->parent    = parent;
+
+    return num_node;
 }
 
 Node* create_var_node(char* variable, Node* left, Node* right, Node* parent)
@@ -252,12 +246,14 @@ Node* create_var_node(char* variable, Node* left, Node* right, Node* parent)
     ASSERT(var_node != nullptr);
 
     var_node->type      = type_var;
-    var_node->left      = left;
-    var_node->right     = right;
     var_node->value     = 0;
     strcpy(var_node->var, variable);
-    var_node->operation = not_operation;
+    var_node->operation = NOT_OPERATION;
+    var_node->left      = left;
+    var_node->right     = right;
     var_node->parent    = parent;
+
+    return var_node;
 }
 
 void error_processing(differentiator_error error)
