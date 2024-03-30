@@ -1,9 +1,11 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "../inc/differentiator_lib.h"
 #include "../inc/operation_lib.h"
 #include "../shared/debug.h"
 #include "../shared/file_lib.h"
+#include "../inc/dsl.h"
 
 differentiator_error differentiator_ctr(Differentiator* differentiator)
 {
@@ -48,11 +50,19 @@ char* make_tree(Differentiator* differentiator)
 {
     ASSERT(differentiator != nullptr);
 
-    // ЧИТАЛКА)))
+    if (*differentiator->buffer == '(')
+    {
+        differentiator->buffer++;
+        make_tree(differentiator);
+    }
+    else if (*differentiator->buffer)
+    {
+
+    }
     return differentiator->buffer;
 }
 
-differentiator_error make_node(Node* node, int type, operation operation, double value, Node* left, Node* right)
+differentiator_error make_node(Node* node, type type, operation operation, double value, Node* left, Node* right)
 {
     node = (Node*)calloc(1, sizeof(Node));
     if (node == nullptr)
@@ -91,6 +101,21 @@ void tree_dtor(Node* ptr_node)
     }
 
     free(ptr_node);
+}
+
+Node* create_op_node(operation operation, Node* left, Node* right)
+{
+
+}
+
+Node* create_num_node(int value, Node* left, Node* right)
+{
+
+}
+
+Node* create_var_node(const char* variable, Node* left, Node* right)
+{
+
 }
 
 void error_processing(differentiator_error error)

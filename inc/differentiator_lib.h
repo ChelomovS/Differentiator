@@ -8,11 +8,19 @@ const size_t MAX_SIZE_OF_BUFFER = 1000;
 
 struct Node
 { 
-    int type;
+    type type;
     operation operation;
     double value;
     Node* left;
     Node* right;
+    Node* parent;
+};
+
+enum type
+{
+    type_num       = 1, // число
+    type_var       = 2, // переменная 
+    type_operation = 3  // операция 
 };
 
 struct Differentiator
@@ -27,6 +35,7 @@ enum differentiator_error{
     differentiator_bad_open_file      = 2,
     differentiator_too_few_files      = 3
 };
+
 
 differentiator_error differentiator_ctr(Differentiator* differntiator);
 differentiator_error load_data(Differentiator* differentiator, const char* file_name);
