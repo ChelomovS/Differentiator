@@ -12,7 +12,8 @@ enum operation
     DIV           = 4,
     SIN           = 5,
     COS           = 6, 
-    LN            = 7
+    LN            = 7,
+    POW           = 8
 };
 
 #endif // OPERATION_LIB

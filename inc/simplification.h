@@ -1,0 +1,4 @@
+#ifndef SIMPLIFICATION_H
+#define SIMPLIFICATION_H
+
+#endif // SIMPLIFICATION_H

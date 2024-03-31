@@ -16,6 +16,7 @@ int main(const int argc, const char** argv)
         error_processing(error);
         return 0;
     }
+    
     error = load_data(&differentiator, argv[1]);
     if (error != differentiator_ok)
     {

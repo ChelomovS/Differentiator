@@ -26,9 +26,6 @@ differentiator_error differentiator_ctr(Differentiator* differentiator)
 differentiator_error load_data(Differentiator* differentiator, const char* file_name)
 {
     ASSERT(differentiator != nullptr);
-    
-    if (file_name == nullptr)
-        return differentiator_bad_open_file;
 
     FILE* filein = fopen(file_name, "r");
     if (filein == nullptr)
@@ -68,20 +65,22 @@ void differentiator_dtr(Differentiator* differentiator)
     ASSERT(differentiator != nullptr);
 
     free(differentiator->buffer);
+    differentiator->buffer = nullptr;
 
     tree_dtor(differentiator->ptr_node);
+    differentiator->ptr_node = nullptr;
 }
 
 void tree_dtor(Node* ptr_node)
 {
     ASSERT(ptr_node != nullptr);
 
-    if (ptr_node->left != NULL)
+    if (ptr_node->left != nullptr)
     {
         tree_dtor(ptr_node->left);
     }
 
-    if (ptr_node->right != NULL)
+    if (ptr_node->right != nullptr)
     {
         tree_dtor(ptr_node->right);
     }
@@ -89,27 +88,22 @@ void tree_dtor(Node* ptr_node)
     free(ptr_node);
 }
 
-Node* diff(Node* ptr_node)
+Node* diff(Node* ptr_node) // обработка ошибок при вызове diff
 {
     ASSERT(ptr_node != nullptr);
 
     Node* new_node = (Node*)calloc(1, sizeof(Node));
+    if (new_node == nullptr)
+        return nullptr;
 
     switch(ptr_node->type)
     {
-        case type_num:
-        {
-            return _NUM(0, ptr_node->parent);
-        }
-
-        case type_var:
-        {
-            return _NUM(1, ptr_node->parent);
-        }
+        case type_num: return _NUM(0, ptr_node->parent);
+        case type_var: return _NUM(1, ptr_node->parent);
 
         case type_operation:
         {
-            switch(ptr_node->operation)
+            switch (ptr_node->operation)
             {
                 case ADD:
                 {
@@ -126,7 +120,7 @@ Node* diff(Node* ptr_node)
                 case MUL:
                 {
                     new_node = _MUL(_ADD(dR, cL, new_node), _ADD(cR, dL, new_node), 
-                                                                 ptr_node->parent);
+                                                            ptr_node->parent);
                     return new_node;
                 }
 
@@ -146,9 +140,8 @@ Node* diff(Node* ptr_node)
 
                 case COS:
                 {
-                    new_node = _MUL(_NUM(-1, new_node), 
-                                        _MUL(dL, _SIN(cL, new_node), ptr_node->parent), 
-                                                                     ptr_node->parent);
+                    new_node = _MUL(_NUM(-1, new_node), _MUL(dL, _SIN(cL, new_node),
+                                                ptr_node->parent), ptr_node->parent);
                     return new_node;
                 }
 
@@ -158,6 +151,10 @@ Node* diff(Node* ptr_node)
                     return new_node;
                 }
                 
+                case POW:
+                {
+    
+                }
                 case NOT_OPERATION:
                 {
                     fprintf(stderr, "shit happened\n");
@@ -179,7 +176,8 @@ Node* copy_node(Node* ptr_node)
     ASSERT(ptr_node != nullptr);
 
     Node* copied_node = (Node*)calloc(1, sizeof(Node));
-    ASSERT(copied_node != nullptr);
+    if (copied_node == nullptr)
+        return nullptr;
 
     // копирование данных из старого узла
     copied_node->type      = ptr_node->type;
@@ -206,11 +204,12 @@ Node* copy_node(Node* ptr_node)
 Node* create_op_node(operation operation, Node* left, Node* right, Node* parent)
 {
     ASSERT(parent != nullptr);
-    ASSERT(left != nullptr);
+    ASSERT(left   != nullptr);
 
     Node* op_node = (Node*)calloc(1, sizeof(Node));
-    ASSERT(op_node != nullptr);
-
+    if (op_node == nullptr)
+        return nullptr;
+        
     op_node->type       = type_operation;
     op_node->value      = 0;
     op_node->operation  = operation;
@@ -226,7 +225,8 @@ Node* create_num_node(double value, Node* left, Node* right, Node* parent)
     ASSERT(parent != nullptr);
 
     Node* num_node = (Node*)calloc(1, sizeof(Node));
-    ASSERT(num_node != nullptr);
+    if (num_node == nullptr)
+        return nullptr;
 
     num_node->type      = type_num;
     num_node->value     = value;
@@ -240,10 +240,12 @@ Node* create_num_node(double value, Node* left, Node* right, Node* parent)
 
 Node* create_var_node(char* variable, Node* left, Node* right, Node* parent)
 {
-    ASSERT(parent != nullptr);
+    ASSERT(parent   != nullptr);
+    ASSERT(variable != nullptr);
 
     Node* var_node = (Node*)calloc(1, sizeof(Node));
-    ASSERT(var_node != nullptr);
+    if (var_node == nullptr)
+        return nullptr;
 
     var_node->type      = type_var;
     var_node->value     = 0;
@@ -258,21 +260,39 @@ Node* create_var_node(char* variable, Node* left, Node* right, Node* parent)
 
 void error_processing(differentiator_error error)
 {
-    if (error == differentiator_bad_alloc)
+    switch (error)
     {
-        fprintf(stderr, "BAD ALLOCATION\n");
-        useage();
+        case differentiator_ok:
+        {
+            return ;
+        }
+
+        case differentiator_bad_alloc:
+        {
+            fprintf(stderr, "BAD ALLOCATION\n");
+            break;
+        }
+
+        case differentiator_bad_open_file:
+        {
+            fprintf(stderr, "NO SUCH FILE OR DIRECTORY");
+            break;
+        }
+
+        case differentiator_too_few_files:
+        {
+            fprintf(stderr, "TOO FEW FILE\n");
+            break;
+        }
+
+        default:
+        {
+            fprintf(stderr, "Shit happend\n");
+            ASSERT(0 && ":(");
+        }
     }
-    else if (error == differentiator_bad_open_file)
-    {
-        fprintf(stderr, "NO SUCH FILE OR DIRECTORY\n");
-        useage();
-    }
-    else if (error == differentiator_too_few_files)
-    {
-        fprintf(stderr, "TOO FEW FILE\n");
-        useage();
-    }
+
+    useage();
 }
 
 void useage()

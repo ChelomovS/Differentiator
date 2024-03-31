@@ -3,5 +3,7 @@ FLAGS = -D _DEBUG -ggdb3 -std=c++17 -O0 -Wall -Wextra -Weffc++  -Wc++14-compat -
 SOURCES = $(wildcard src/*.cpp) $(wildcard shared/*.cpp) 
 EXE = differentiator
 
+# INCLUDE = -Iinc/
+
 all:
 	@ $(CC) $(FLAGS) $(SOURCES) -o $(EXE)

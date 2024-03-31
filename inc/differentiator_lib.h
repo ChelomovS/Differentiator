@@ -4,11 +4,12 @@
 #include <stdio.h>
 #include "operation_lib.h"
 
-const size_t MAX_SIZE_OF_BUFFER = 1000;
-const size_t MAX_SIZE_OF_VAR    = 5;
+static const size_t MAX_SIZE_OF_BUFFER = 1000;
+static const size_t MAX_SIZE_OF_VAR    = 5;
 
 enum type
 {
+    type_uninit    = 0,
     type_num       = 1, // число
     type_var       = 2, // переменная 
     type_operation = 3  // операция 
