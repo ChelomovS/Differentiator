@@ -9,7 +9,7 @@ static const size_t MAX_SIZE_OF_VAR    = 5;
 
 enum type
 {
-    type_uninit    = 0,
+    type_uninit    = 0, // неинициализованный тип
     type_num       = 1, // число
     type_var       = 2, // переменная 
     type_operation = 3  // операция 

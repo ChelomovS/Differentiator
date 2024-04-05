@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "../inc/differentiator_lib.h"
+#include "../inc/simplification.h"
 #include "../inc/operation_lib.h"
 #include "../shared/debug.h"
 #include "../shared/file_lib.h"
@@ -26,6 +27,7 @@ differentiator_error differentiator_ctr(Differentiator* differentiator)
 differentiator_error load_data(Differentiator* differentiator, const char* file_name)
 {
     ASSERT(differentiator != nullptr);
+    ASSERT(file_name != nullptr);
 
     FILE* filein = fopen(file_name, "r");
     if (filein == nullptr)
@@ -76,14 +78,10 @@ void tree_dtor(Node* ptr_node)
     ASSERT(ptr_node != nullptr);
 
     if (ptr_node->left != nullptr)
-    {
         tree_dtor(ptr_node->left);
-    }
 
     if (ptr_node->right != nullptr)
-    {
         tree_dtor(ptr_node->right);
-    }
 
     free(ptr_node);
 }
@@ -171,6 +169,21 @@ Node* diff(Node* ptr_node) // обработка ошибок при вызов�
     }
 }
 
+Node* differentiate(Node* ptr_node, differentiator_error error)
+{
+    ASSERT(ptr_node != nullptr);
+
+    size_t counter = 0;
+
+    Node* diff_tree = diff(ptr_node);
+    if (diff_tree == nullptr)
+        return nullptr;
+
+    do {
+        diff_tree = simlificate(diff_tree, &counter, error);
+    } while(counter != 0)
+}
+
 Node* copy_node(Node* ptr_node)
 {
     ASSERT(ptr_node != nullptr);
@@ -188,15 +201,11 @@ Node* copy_node(Node* ptr_node)
 
     // рекурсивный вызов в левое поддерево
     if (ptr_node->left)
-    {
         copied_node->left = copy_node(ptr_node->left);
-    }
     
     // рекурсивный вызов в правое поддерево
     if (ptr_node->right)
-    {
         copied_node->left = copy_node(ptr_node->right);
-    }
 
     return copied_node;
 }
@@ -263,33 +272,23 @@ void error_processing(differentiator_error error)
     switch (error)
     {
         case differentiator_ok:
-        {
             return ;
-        }
 
         case differentiator_bad_alloc:
-        {
             fprintf(stderr, "BAD ALLOCATION\n");
             break;
-        }
 
         case differentiator_bad_open_file:
-        {
             fprintf(stderr, "NO SUCH FILE OR DIRECTORY");
             break;
-        }
 
         case differentiator_too_few_files:
-        {
             fprintf(stderr, "TOO FEW FILE\n");
             break;
-        }
 
         default:
-        {
             fprintf(stderr, "Shit happend\n");
             ASSERT(0 && ":(");
-        }
     }
 
     useage();

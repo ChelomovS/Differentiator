@@ -8,10 +8,10 @@ enum operation
     NOT_OPERATION = 0,
     ADD           = 1,
     SUB           = 2,
-    MUL           = 3,  
+    MUL           = 3,
     DIV           = 4,
     SIN           = 5,
-    COS           = 6, 
+    COS           = 6,
     LN            = 7,
     POW           = 8
 };
