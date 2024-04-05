@@ -173,15 +173,13 @@ Node* differentiate(Node* ptr_node, differentiator_error error)
 {
     ASSERT(ptr_node != nullptr);
 
-    size_t counter = 0;
+    bool change_flag = 0;
 
     Node* diff_tree = diff(ptr_node);
     if (diff_tree == nullptr)
         return nullptr;
 
-    do {
-        diff_tree = simlificate(diff_tree, &counter, error);
-    } while(counter != 0)
+    diff_tree = simplificate(diff_tree);
 }
 
 Node* copy_node(Node* ptr_node)
@@ -210,7 +208,7 @@ Node* copy_node(Node* ptr_node)
     return copied_node;
 }
 
-Node* create_op_node(operation operation, Node* left, Node* right, Node* parent)
+Node* create_op_node(operation operation, Node* left, Node* right, Node* parent, size_t arg_number)
 {
     ASSERT(parent != nullptr);
     ASSERT(left   != nullptr);
@@ -219,17 +217,18 @@ Node* create_op_node(operation operation, Node* left, Node* right, Node* parent)
     if (op_node == nullptr)
         return nullptr;
         
-    op_node->type       = type_operation;
-    op_node->value      = 0;
-    op_node->operation  = operation;
-    op_node->parent     = parent;    
-    op_node->left       = left;
-    op_node->right      = right;
+    op_node->type        = type_operation;
+    op_node->value       = 0;
+    op_node->operation   = operation;
+    op_node->parent      = parent;
+    op_node->left        = left;
+    op_node->right       = right;
+    op_node->arg_number  = arg_number;
 
     return op_node;
 }
 
-Node* create_num_node(double value, Node* left, Node* right, Node* parent)
+Node* create_num_node(double value, Node* left, Node* right, Node* parent, size_t arg_number)
 {
     ASSERT(parent != nullptr);
 
@@ -237,17 +236,18 @@ Node* create_num_node(double value, Node* left, Node* right, Node* parent)
     if (num_node == nullptr)
         return nullptr;
 
-    num_node->type      = type_num;
-    num_node->value     = value;
-    num_node->operation = NOT_OPERATION;
-    num_node->left      = left;
-    num_node->right     = right;
-    num_node->parent    = parent;
+    num_node->type       = type_num;
+    num_node->value      = value;
+    num_node->operation  = NOT_OPERATION;
+    num_node->left       = left;
+    num_node->right      = right;
+    num_node->parent     = parent;
+    num_node->arg_number = arg_number;
 
     return num_node;
 }
 
-Node* create_var_node(char* variable, Node* left, Node* right, Node* parent)
+Node* create_var_node(char* variable, Node* left, Node* right, Node* parent, size_t arg_number)
 {
     ASSERT(parent   != nullptr);
     ASSERT(variable != nullptr);
@@ -256,15 +256,22 @@ Node* create_var_node(char* variable, Node* left, Node* right, Node* parent)
     if (var_node == nullptr)
         return nullptr;
 
-    var_node->type      = type_var;
-    var_node->value     = 0;
+    var_node->type       = type_var;
+    var_node->value      = 0;
     strcpy(var_node->var, variable);
-    var_node->operation = NOT_OPERATION;
-    var_node->left      = left;
-    var_node->right     = right;
-    var_node->parent    = parent;
+    var_node->operation  = NOT_OPERATION;
+    var_node->left       = left;
+    var_node->right      = right;
+    var_node->parent     = parent;
+    var_node->arg_number = arg_number;
 
     return var_node;
+}
+
+void node_delete(Node* node)
+{
+    free(node);
+    node = nullptr;
 }
 
 void error_processing(differentiator_error error)

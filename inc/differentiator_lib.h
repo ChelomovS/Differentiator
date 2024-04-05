@@ -2,6 +2,7 @@
 #define DIFFERENTIATOR_LIB
 
 #include <stdio.h>
+
 #include "operation_lib.h"
 
 static const size_t MAX_SIZE_OF_BUFFER = 1000;
@@ -21,6 +22,7 @@ struct Node
     operation operation;       // тип операции
     double value;              // значение const 
     char var[MAX_SIZE_OF_VAR]; // имя переменной
+    size_t arg_number;
 
     Node* left;                // указатель на левый узел
     Node* right;               // указатель на правый узед
@@ -48,9 +50,10 @@ void differentiator_dtr(Differentiator* differentiator);
 void tree_dtor(Node* ptr_node);
 Node* diff(Node* node);
 Node* copy_node(Node* node);
-Node* create_op_node(operation operation, Node* left, Node* right, Node* parent);
-Node* create_num_node(double value, Node* left, Node* right, Node* parent);
-Node* create_var_node(char* variable, Node* left, Node* right, Node* parent);
+Node* create_op_node(operation operation, Node* left, Node* right, Node* parent, size_t arg_number);
+Node* create_num_node(double value, Node* left, Node* right, Node* parent, size_t arg_number);
+Node* create_var_node(char* variable, Node* left, Node* right, Node* parent, size_t arg_number);
+void node_delete(Node* node);
 void error_processing(differentiator_error error);
 void useage();
 
